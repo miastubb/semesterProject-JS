@@ -1,15 +1,15 @@
 const KEY = "rainydays_cart_v1";
-
+//read cart array from storage
 export function getCart() {
   try {return JSON.parse(localStorage.getItem(KEY)) ||[]; }
   catch { return[];}
 }
-
+//save the cart back to storage
 export function saveCart(items) {
   localStorage.setItem(KEY, JSON.stringify(items));
   window.dispatchEvent(new CustomEvent("cart:updated", {detail: {items} }));
 }
-
+//ad a product or bump its quatity
 export function addToCart(productId, qty = 1) {
   const items = getCart();
   const found = items.find(i => i.id === productId);
@@ -17,7 +17,7 @@ export function addToCart(productId, qty = 1) {
   else items.push({ id: productId, qty });
   saveCart(items);
 }
-
+//return the quantity across all lines
 export function getCartCount() {
   return getCart().reduce((sum, i) => sum + i.qty, 0);
 }

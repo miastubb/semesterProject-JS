@@ -1,7 +1,8 @@
+//import additional js files//
 import { addToCart, getCartCount } from "./cart.js";
 import { updateCartBadge } from "./ui.js";
 
-const ENDPOINT = "https://v2.api.noroff.dev/rainy-days";
+const ENDPOINT = "https://v2.api.noroff.dev/rainy-days"; //uploading noroff api
 
 async function fetchProducts() {
   const res = await fetch(ENDPOINT, { headers: { Accept: "application/json" } });
@@ -13,20 +14,22 @@ async function fetchProducts() {
 function mapRainyDays(p) {
   const g = String(p.gender || "").toLowerCase();
   const gender = g.includes("female") ? "women" : g.includes("male") ? "men" : "unisex";
-  return {
+  return { //normalize gender into to "women", "men", and "unisex"
     id: p.id,
     title: p.title,
-    price: p.discountedPrice ?? p.price,
+    price: p.discountedPrice ?? p.price, 
     image: p.image?.url,
     gender,
   };
 }
+//attempt to load and display products on pages that have #list
 
 (async function bootProducts() {
-  const list = document.getElementById("list");
-  if (!list) return;
+  const list = document.getElementById("list");//target container for product card
+  if (!list) return; //not a product listing page, nothing to do
   list.innerHTML = "Loading…";
   const products = await fetchProducts();
+  //render each product as a card with an add to cart button
   list.innerHTML = products.map(p => `
     <article class="card" data-id="${p.id}">
       <img src="${p.image}" alt="${p.title}" loading="lazy" />
@@ -38,19 +41,20 @@ function mapRainyDays(p) {
   `).join("");
 })();
 
-
+/**keep the header cart accurate, on initial load plus whenever 
+ * any part of the app use: "cart;updated"*/
 updateCartBadge(getCartCount());
 
 window.addEventListener("cart:updated", () => {
   updateCartBadge(getCartCount());
 });
 
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".add-to-cart");
+document.addEventListener("click", (e) => { //watches for clicks that bubble up from any .add-to-cart button//
+  const btn = e.target.closest(".add-to-cart");//Reads the product data-id, calls addToCart(id, 1).Updates the badge immediately.//
   if (!btn) return;
 
   const id = btn.dataset.id;
-  addToCart(id, 1);
+  addToCart(id, 1);//update storage//
 
   updateCartBadge(getCartCount());
 
