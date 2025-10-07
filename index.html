@@ -1,0 +1,101 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rainy Days - Durable Raingear</title>
+    <meta
+      name="description"
+      content="Rainy Days — the go-to store for durable raingear."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="styles/variables.css" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="./">Rainy Days</a>
+
+        <a class="cart-link" href="checkout.html">
+          <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+          <span class="cart-count" aria-live="polite" aria-atomic="true" hidden>
+            0
+          </span>
+        </a>
+      </div>
+    </header>
+
+    <main class="container" id="main">
+      <h1>Products</h1>
+
+      <section class="controls" aria-labelledby="filters-heading">
+        <h2 id="filters-heading" class="sr-only">Filters</h2>
+
+        <label>
+          Gender
+          <select id="filter-gender" aria-label="Filter by gender">
+            <option value="">All</option>
+          </select>
+        </label>
+
+        <label>
+          Tag
+          <select id="filter-tag" aria-label="Filter by tag">
+            <option value="">All</option>
+          </select>
+        </label>
+
+        <label>
+          Search
+          <input
+            id="filter-search"
+            type="search"
+            placeholder="Find products…"
+          />
+        </label>
+
+        <button id="apply-filters" class="ghost">Apply</button>
+        <button id="clear-filters" class="ghost">Clear</button>
+      </section>
+      <section aria-labelledby="results-heading">
+        <h2 id="results-heading" class="sr-only">Product results</h2>
+      <div id="message" hidden></div>
+      <section id="list" class="grid">
+      </section>
+    </main>
+    <footer>
+      <div class="footer-column">
+        <h3>Follow Us</h3>
+        <div class="social-links">
+          <a href="https://facebook.com" aria-label="Facebook">
+            <i class="fa-brands fa-facebook"></i>
+          </a>
+          <a href="https://instagram.com" aria-label="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="https://tiktok.com" aria-label="TikTok">
+            <i class="fa-brands fa-tiktok"></i>
+          </a>
+          <a href="https://youtube.com" aria-label="YouTube">
+            <i class="fa-brands fa-youtube"></i>
+          </a>
+        </div>
+      </div>
+    </footer>
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

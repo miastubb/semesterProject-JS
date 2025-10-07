@@ -1,0 +1,26 @@
+:root {
+  /* color scheme (yours) */
+  --header-footer-bg: #37752f;
+  --header-footer-text: #ffffff;
+  --body-bg: #dbf5df;
+  --body-text: #000000;
+
+  /* type scale */
+  --h1-size: clamp(1.8rem, 5vw, 2.6rem);
+  --h2-size: clamp(1.4rem, 3.5vw, 2rem);
+  --body-size: clamp(1rem, 2.5vw, 1.6rem);
+  --nav-size: clamp(1.2rem, 3vw, 2rem);
+  --menu-size: clamp(1.2rem, 3.5vw, 1.8rem);
+
+  /* spacing */
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
+
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
+
+ 
+  --border-color: #ebf5eb;   
+  --focus-color: #37752f;    
+}
