@@ -63,3 +63,23 @@ document.addEventListener("click", (e) => { //watches for clicks that bubble up 
   btn.textContent = "added";
   setTimeout(() => {btn.textContent = prev; btn.disabled = false; }, 700);
 });
+/*
+document.addEventListener('DOMContentLoaded', () => {
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const products = document.querySelectorAll('product');
+
+   filterButtons.forEach(button => {
+    button.addEventListener('click', (event) => {
+      const selctedCategory = event.target.dataset.category;
+
+        products.forEach(product => {
+                const productCategory = product.dataset.category;
+                 if (selectedCategory === 'all' || productCategory === selectedCategory) {
+                    product.style.display = 'block'; // Show the product
+                } else {
+                    product.style.display = 'none'; // Hide the product
+                }
+    });
+  });            trying to make a filter, code is clean but does nothing(incomplete/incorrect)
+  });
+}); */

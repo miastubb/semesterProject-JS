@@ -9,7 +9,7 @@ export function saveCart(items) {
   localStorage.setItem(KEY, JSON.stringify(items));
   window.dispatchEvent(new CustomEvent("cart:updated", {detail: {items} }));
 }
-//ad a product or bump its quatity
+//add a product or bump its quatity
 export function addToCart(productId, qty = 1) {
   const items = getCart();
   const found = items.find(i => i.id === productId);
