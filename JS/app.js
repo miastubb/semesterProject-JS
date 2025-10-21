@@ -14,10 +14,15 @@ updateCartBadge(getCartCount());
 window.addEventListener("cart:updated", () => updateCartBadge(getCartCount()));
 
 async function fetchProducts() {
-  const res = await fetch(ENDPOINT, { headers: { Accept: "application/json" } });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const { data } = await res.json();              
-  return data.map(mapRainyDays);
+  try {
+    const res = await fetch(ENDPOINT, { headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { data } = await res.json();
+    if (!Array.isArray(data)) throw new Error("Unexpected API response shape");
+    return data.map(mapRainyDays);
+  } catch (err) {
+    throw new Error(`Failed to load products: ${err.message}`);
+  }
 }
 
 function mapRainyDays(p) {
@@ -74,9 +79,6 @@ function applyFilters(raw) {
 let ALL_PRODUCTS = [];
 
 (async function boot() {
-  updateCartBadge(getCartCount());
-  window.addEventListener("cart:updated", () => updateCartBadge(getCartCount()));
-
   const list = document.getElementById("list");
   if (!list) return;
   list.innerHTML = `<span class="spinner">Loading...</span>`;
@@ -247,3 +249,84 @@ function render() {
 
   render();
 })();
+//=========checkout page========//
+(function bootCheckoutPage() {
+  const root = document.getElementById("checkout-root");
+  if (!root) return; //not on checkout.html
+
+  const listEl = document.getElementById("checkout-list");
+  const subEl = document.getElementById("co-subtotal");
+  const taxEl = document.getElementById("co-tax");
+  const totEl = document.getElementById("co-total");
+  const form = document.getElementById("checkout-form");
+  const errEl = document.getElementById("checkout-error");
+
+  const items = getCart();
+  if (!items.length) {
+    listEl.innerHTML = `<p>Your cart is empty.</p>`;
+    subEl.textContent = USD.format(0);
+    taxEl.textContent = USD.format(0);
+    totEl.textContent = USD.format(0);
+    if (form) form.querySelector("button[type='submit']").disabled = true;
+    return;
+  }
+
+  Promise.resolve(fetchProducts()).then(catalog => {
+    const byId = new Map(catalog.map(p => [p.id, p]));
+    const lines = items
+    .map(({ id, qty }) => {
+      const p = byId.get(id);
+      if (!p) return null;
+      const price = Number(p.price ?? p.discountedPrice ?? 0);
+      return {
+        id, qty,
+        title: p.title,
+        image: typeof p.image === "string" ? p.image : (p.image?.url || ""),
+        price, lineTotal: price * qty
+      };
+    })
+    .filter(Boolean);
+
+    listEl.innerHTML = lines.map(l => `
+      <div class="cart-line" data-id="${l.id}">
+      <img src="${l.image}" alt="${l.title}">
+      <div>
+      <h3 class="cart-line__title">${l.title}</h3>
+      <div class="cart-line__meta">${USD.format(l.price)} x ${l.qty}</div>
+      </div>
+      <div class="cart-line__total">${USD.format(l.lineTotal)}</div>
+      </div>
+    `).join("");
+
+    const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
+    const tax = 0;
+    const total = subtotal + tax;
+
+    subEl.textContent = USD.format(subtotal);
+    taxEl.textContent = USD.format(tax);
+    totEl.textContent = USD.format(total);
+  });
+   
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        errEl.hidden = true;
+        if (!form.checkValidity()) {
+        errEl.textContent = "Please complete the required fields.";
+        errEl.hidden = false;
+        return;
+      }
+       
+      clearCart();
+      root.innerHTML = `
+      <div class="notice">
+      <h2>Thank You!</h2>
+      <p>Your order has been placed, A confirmation is on its way.</p>
+      <a class="primary" href="products.html">Continue Shopping</a>
+      </div>
+      `;
+      });
+    }
+  })();
+
+  

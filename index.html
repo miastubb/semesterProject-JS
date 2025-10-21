@@ -1,5 +1,4 @@
 <!-- @format -->
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,7 +7,7 @@
     <title>Rainy Days - Durable Raingear</title>
     <meta
       name="description"
-      content="Rainy Days — the go-to store for durable raingear."
+      content="Stay dry. Go further. Explore durable, storm-ready jackets from Rainy Days."
     />
     <meta name="color-scheme" content="light dark" />
     <link
@@ -25,7 +24,7 @@
       rel="stylesheet"
     />
   </head>
-  <body>
+  <body class="home">
     <header class="site-header">
       <div class="container header-inner">
         <a class="brand" href="./">Rainy Days</a>
@@ -39,46 +38,22 @@
       </div>
     </header>
 
-    <main class="container" id="main">
-      <h1>Products</h1>
-
-      <section class="controls" aria-labelledby="filters-heading">
-        <h2 id="filters-heading" class="sr-only">Filters</h2>
-
-        <label>
-          Gender
-          <select id="filter-gender" aria-label="Filter by gender">
-            <option value="">All</option>
-            <option value="women">Female</option>
-            <option value="men">Male</option>
-          </select>
-        </label>
-
-        <label>
-          Tag
-          <select id="filter-tag" aria-label="Filter by tag">
-            <option value="">All</option>
-          </select>
-        </label>
-
-        <label>
-          Search
-          <input
-            id="filter-search"
-            type="search"
-            placeholder="Find products…"
+    <main id="main" class="container">
+      <section class="hero full-bleed" aria-labelledby="hero-heading">
+        <div class="hero__media">
+          <img
+            class="hero__img"
+            src="images/Foss.jpg"
+            alt="Mountain in heavy rain"
           />
-        </label>
-
-        <button id="apply-filters" class="ghost">Apply</button>
-        <button id="clear-filters" class="ghost">Clear</button>
-      </section>
-      <section aria-labelledby="results-heading">
-        <h2 id="results-heading" class="sr-only">Product results</h2>
-      <div id="message" hidden></div>
-      <section id="list" class="grid">
+        </div>
+        <div class="hero__content">
+          <h1 id="hero-heading" class="sr-only">Built for real weather</h1>
+          <a class="primary hero__cta" href="products.html">Shop jackets now</a>
+        </div>
       </section>
     </main>
+
     <footer>
       <div class="footer-column">
         <h3>Follow Us</h3>
@@ -98,6 +73,6 @@
         </div>
       </div>
     </footer>
-    <script type="module" src="./JS/app.js"></script>
+    <script type="module" src="./js/app.js"></script>
   </body>
 </html>

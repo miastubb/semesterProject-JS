@@ -8,7 +8,7 @@
     <title>Rainy Days - Durable Raingear</title>
     <meta
       name="description"
-      content="Rainy Days — the go-to store for durable raingear."
+      content="Rainy Days — the go-to store for durable raingear. We aim to be your number one choice for all things rain-related."
     />
     <meta name="color-scheme" content="light dark" />
     <link
@@ -30,7 +30,7 @@
       <div class="container header-inner">
         <a class="brand" href="./">Rainy Days</a>
 
-        <a class="cart-link" href="checkout.html">
+        <a class="cart-link" href="cart.html">
           <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
           <span class="cart-count" aria-live="polite" aria-atomic="true" hidden>
             0
@@ -38,6 +38,86 @@
         </a>
       </div>
     </header>
+    <main class="container">
+      <h1>Checkout</h1>
+      <section id="checkout-root" class="checkout">
+        <div class="checkout__left">
+          <h2>Order summary</h2>
+          <div id="checkout-list" class="checkout__list">
+            <span class="spinner">Loading…</span>
+          </div>
+          <div class="checkout__totals">
+            <div>
+              <span>Subtotal</span>
+              <strong id="co-subtotal">$0.00</strong>
+            </div>
+            <div>
+              <span>Estimated tax</span>
+              <span id="co-tax">$0.00</span>
+            </div>
+            <div class="checkout__total">
+              <span>Total</span>
+              <strong id="co-total">$0.00</strong>
+            </div>
+          </div>
+        </div>
+
+        <form id="checkout-form" class="checkout__form" novalidate>
+          <h2>Billing details</h2>
+          <label>
+            Full name
+            <input name="name" required />
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" required />
+          </label>
+          <label>
+            Address
+            <input name="address" required />
+          </label>
+          <label>
+            City
+            <input name="city" required />
+          </label>
+          <label>
+            Postal code
+            <input name="zip" required pattern="\\d{4,10}" />
+          </label>
+
+          <h2>Payment</h2>
+          <label>
+            Card number
+            <input
+              name="card"
+              inputmode="numeric"
+              minlength="12"
+              maxlength="19"
+              required
+            />
+          </label>
+          <label>
+            Expiry
+            <input name="exp" placeholder="MM/YY" required />
+          </label>
+          <label>
+            CVC
+            <input
+              name="cvc"
+              inputmode="numeric"
+              minlength="3"
+              maxlength="4"
+              required
+            />
+          </label>
+
+          <button class="primary" type="submit" id="place-order">
+            Place order
+          </button>
+          <p id="checkout-error" class="error" hidden></p>
+        </form>
+      </section>
+    </main>
     <footer>
       <div class="footer-column">
         <h3>Follow Us</h3>

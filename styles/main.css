@@ -76,6 +76,53 @@ h1 { font-size: var(--h1-size); margin: 0 0 var(--spacing-sm); }
 h2 { font-size: var(--h2-size); margin: var(--spacing-md) 0 var(--spacing-sm); }
 h3 { margin: var(--spacing-sm) 0; }
 
+/* ---------- landing page hero (index only) ---------- */
+
+.full-bleed {
+  inline-size: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
+.hero { position: relative; }
+
+.hero__media {
+  position: relative;
+  height: clamp(260px, 45vh, 520px); 
+  overflow: hidden;                  
+}
+
+.hero__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;                
+}
+
+.hero__content {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;               
+  text-align: center;
+  color: #fff;
+  padding: 1rem;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  pointer-events: none;
+}
+
+.hero__cta { padding: .75rem 1.25rem; }
+
+/* ---------- home page only --------*/
+.home { min-height: 100svh; display: flex; flex-direction: column; }
+.home #main { flex: 1; }
+
 /* ---------- filters (controls) ---------- */
 .controls {
   display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin: var(--spacing-md) 0;
@@ -98,6 +145,47 @@ button.primary:hover { filter: brightness(.95); }
 button.ghost { background: transparent; border-color: var(--header-footer-bg); color: var(--header-footer-bg); }
 button.danger { background: #b00020; color: #fff; }
 
+a.primary {
+    background: var(--header-footer-bg);
+  color: var(--header-footer-text);
+  text-decoration: none;
+  display: inline-block;
+  padding: .6rem .9rem;
+  border-radius: var(--border-radius);
+  border: 1px solid transparent;
+  transition: var(--transition);
+}
+a.primary:hover { filter: brightness(.95); 
+}
+
+/* accessibility helper (for hidden headings) */
+.sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%); 
+  border: 0;
+  white-space: nowrap;
+}
+/* buttons & links share the same utility classes */
+.primary, .ghost, .danger {
+  display: inline-block;
+  font: inherit;
+  border-radius: var(--border-radius);
+  padding: .6rem .9rem;
+  border: 1px solid transparent;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.primary { background: var(--header-footer-bg); color: var(--header-footer-text); }
+.primary:hover { filter: brightness(.95); }
+.ghost { background: transparent; border-color: var(--header-footer-bg); color: var(--header-footer-bg); }
+.danger { background: #b00020; color: #fff; }
+
 /* ---------- product grid & cards ---------- */
 main {max-width: 1100px; margin-inline: auto; padding: 1rem; }
 #list.grid {
@@ -115,6 +203,7 @@ main {max-width: 1100px; margin-inline: auto; padding: 1rem; }
   height: 100%;
   gap: .5rem;
   background: #fff;
+  transition: box-shadow .2s, border-color .2s ease;
 }
 .card > img {
   width: 100%;
@@ -131,6 +220,7 @@ main {max-width: 1100px; margin-inline: auto; padding: 1rem; }
   line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: calc(1.25em * 2);
@@ -162,6 +252,13 @@ main {max-width: 1100px; margin-inline: auto; padding: 1rem; }
 }
 .card .price { font-weight: 700;}
 
+.card:hover,
+.card:focus-visible,
+.card.card-hovered {
+  box-shadow: 0 8px 24px rgb(0, 0, 0, .2); 
+  border-color: #333;
+  transform: translateY(-2px) scale(1.01);
+}
 /*cart page*/
 .cart {
   display: grid;
@@ -248,3 +345,4 @@ s { color: #606060; }
   border-radius: 50%; display: inline-block; animation: spin .8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
