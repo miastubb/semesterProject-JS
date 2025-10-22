@@ -4,6 +4,8 @@
   --header-footer-text: #ffffff;
   --body-bg: #dbf5df;
   --body-text: #000000;
+  --card-bg: var(--surface, #fff); 
+
 
   /* type scale */
   --h1-size: clamp(1.8rem, 5vw, 2.6rem);
