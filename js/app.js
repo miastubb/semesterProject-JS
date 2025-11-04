@@ -40,9 +40,60 @@ const USD = new Intl.NumberFormat("en-US", {
 updateCartBadge(getCartCount());
 window.addEventListener("cart:updated", () => updateCartBadge(getCartCount()));
 
+//__________________________________________________________________
+//Small DOM helpers
+//________________________________________________________________________
+function el(tag, attrs = {}, ...children) {
+const node = document.createElement(tag);
+for (const [k, v] of Object.entries(attrs || {})) {
+if (v === null || v === undefined) continue;
+if (k === "class" || k === "className") node.className = String(v);
+else if (k === "dataset" && v && typeof v === "object") {
+for (const [dk, dv] of Object.entries(v)) node.dataset[dk] = String(dv);
+} else if (k in node) {
+try { node[k] = v; } catch { node.setAttribute(k, String(v)); }
+} else {
+node.setAttribute(k, String(v));
+}
+}
+for (const c of children.flat()) {
+node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+}
+return node;
+}
+
+
+/** Replace children efficiently. */
+function replace(elm, ...kids) {
+const frag = document.createDocumentFragment();
+for (const k of kids.flat()) frag.appendChild(k);
+elm.replaceChildren(frag);
+}
+
+function displayError(message) {
+  let bar = document.querySelector(".error-bar");
+  if (!bar) {
+    bar = el(
+      "div",
+      { class: "error-bar", role: "alert", "aria-live": "polite" },
+      message
+    );
+  Object.assign(bar.style, {
+    backgroundColor: "#c0392b",
+    color: "white",
+    padding: "1rem",
+    textAlign: "center",
+    fontWeight: "700",
+  });
+  document.body.prepend(bar);
+  } else {
+    bar.textContent = message;
+  }
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 // API: Fetch + Normalize
-// ──────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 /**
  * Fetch products from Noroff v2 and return a normalized array
@@ -60,7 +111,10 @@ async function fetchProducts() {
     if (!Array.isArray(data)) throw new Error("Unexpected API response shape");
 
     return data.map(normalizeProduct);
+
   } catch (err) {
+    displayError(`Error fetching products: ${err.message}`);
+
     throw new Error(`Failed to load products: ${err.message}`);
   }
 }
@@ -95,27 +149,46 @@ function normalizeProduct(p) {
 // ──────────────────────────────────────────────────────────────────────────────
 
 /** Small template for a single product card */
-function cardTemplate(p) {
-  return `
-    <article class="card" data-id="${p.id}">
-      <img src="${p.imageUrl}" alt="${escapeHtml(p.title)}" loading="lazy" />
-      <h3 class="card__title">${escapeHtml(p.title)}</h3>
-      <p class="price">${USD.format(p.price)}</p>
-      <small class="tag">${p.gender}</small>
-      <button class="primary add-to-cart" data-id="${p.id}" aria-label="Add ${escapeHtml(p.title)} to cart">
-        Add to cart
-      </button>
-    </article>
-  `;
-}
+function cardElement(p) {
+const img = el("img", { src: p.imageUrl, alt: p.title, loading: "lazy" });
+const title = el("h3", { class: "card__title" }, p.title);
+const price = el("p", { class: "price" }, USD.format(p.price));
+const tag = el("small", { class: "tag" }, p.gender);
+const btn = el(
+"button",
+{
+class: "primary add-to-cart",
+dataset: { id: p.id },
+ariaLabel: `Add ${p.title} to cart`,
+},
+"Add to cart"
+);
 
+
+return el(
+"article",
+{ class: "card", dataset: { id: p.id } },
+img,
+title,
+price,
+tag,
+btn
+);
+}
 /** Render list or an empty-state message */
 function renderProducts(listEl, products) {
-  if (!products?.length) {
-    listEl.innerHTML = `<p class="notice" role="status" aria-live="polite">No products matched your filters.</p>`;
-    return;
-  }
-  listEl.innerHTML = products.map(cardTemplate).join("");
+if (!products?.length) {
+const notice = el(
+"p",
+{ class: "notice", role: "status", ariaLive: "polite" },
+"No products matched your filters."
+);
+replace(listEl, notice);
+return;
+}
+const frag = document.createDocumentFragment();
+for (const p of products) frag.appendChild(cardElement(p));
+listEl.replaceChildren(frag);
 }
 
 /** Read current filters (safe if the elements are missing) */
@@ -189,15 +262,22 @@ function bindListControls(listEl, allProducts) {
   const list = document.getElementById("list");
   if (!list) return; // not on products page
 
-  list.innerHTML = `<span class="spinner" aria-live="polite">Loading…</span>`;
+  const spinner = el("span", { class: "spinner", ariaLive: "polite" }, "Loading…");
+replace(list, spinner);
 
-  try {
-    const products = await fetchProducts();
-    renderProducts(list, products);
-    bindListControls(list, products);
-  } catch (err) {
-    list.innerHTML = `<p class="error" role="alert">Could not load products. ${escapeHtml(err.message)}</p>`;
-  }
+
+try {
+const products = await fetchProducts();
+renderProducts(list, products);
+bindListControls(list, products);
+} catch (err) {
+const msg = el(
+"p",
+{ class: "error", role: "alert" },
+`Could not load products. ${err.message}`
+);
+replace(list, msg);
+}
 })();
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -225,9 +305,12 @@ function bindListControls(listEl, allProducts) {
   try {
     catalog = await fetchProducts(); // normalized shape
   } catch {
-    listEl.innerHTML = `<p class="error" role="alert">Could not load products. Please try again later.</p>`;
-    return;
-  }
+    replace(
+listEl,
+el("p", { class: "error", role: "alert" }, "Could not load products. Please try again later.")
+);
+return;
+}
 
   // Quick access by id
   const byId = new Map(catalog.map((p) => [p.id, p]));
@@ -250,52 +333,63 @@ function bindListControls(listEl, allProducts) {
       .filter(Boolean);
   }
 
-  /** Render the entire cart view  */
-  function render() {
-    const lines = enrichLines();
+/** Render the entire cart view  */
+/** Build one cart-line element */
+function cartLineElement(l) {
+  const img = el("img", { src: l.imageUrl, alt: l.title, loading: "lazy" });
 
-    if (!lines.length) {
-      listEl.innerHTML = `<p>Your cart is empty.</p>`;
-      subEl.textContent = USD.format(0);
-      taxEl.textContent = USD.format(0);
-      totEl.textContent = USD.format(0);
-      return;
-    }
+  const title = el("h3", { class: "cart-line__title" }, l.title);
+  const meta = el("div", { class: "cart-line__meta" }, USD.format(l.price));
 
-    listEl.innerHTML = lines
-      .map(
-        (l) => `
-      <div class="cart-line" data-id="${l.id}">
-        <img src="${l.imageUrl}" alt="${escapeHtml(l.title)}">
-        <div>
-          <h3 class="cart-line__title">${escapeHtml(l.title)}</h3>
-          <div class="cart-line__meta">${USD.format(l.price)} each</div>
+  const qty = el(
+    "div",
+    { class: "cart-line__qty" },
+    el("button", { class: "ghost decr", type: "button", "aria-label": "Decrease quantity" }, "−"),
+    el("input", { type: "number", min: 1, value: String(l.qty) }),
+    el("button", { class: "ghost incr", type: "button", "aria-label": "Increase quantity" }, "+")
+  );
 
-          <div class="qty" role="group" aria-label="Change quantity">
-            <button class="decr" aria-label="Decrease">−</button>
-            <input type="number" min="1" value="${l.qty}" inputmode="numeric">
-            <button class="incr" aria-label="Increase">+</button>
-          </div>
+  const actions = el(
+    "div",
+    { class: "cart-line__actions" },
+    el("button", { class: "ghost remove", type: "button" }, "Remove")
+  );
 
-          <div class="cart-line__actions">
-            <button class="ghost remove">Remove</button>
-          </div>
-        </div>
+  const left = el("div", { class: "cart-line__left" }, title, meta, qty, actions);
+  const total = el("div", { class: "cart-line__total" }, USD.format(l.lineTotal));
 
-        <div class="cart-line__total">${USD.format(l.lineTotal)}</div>
-      </div>
-    `
-      )
-      .join("");
+  return el("div", { class: "cart-line", dataset: { id: l.id } }, img, left, total);
+}
 
-    const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
-    const tax = 0; // set your tax if needed
-    const total = subtotal + tax;
 
-    subEl.textContent = USD.format(subtotal);
-    taxEl.textContent = USD.format(tax);
-    totEl.textContent = USD.format(total);
-  }
+/** Render the entire cart view */
+function render() {
+const lines = enrichLines();
+
+
+if (!lines.length) {
+replace(listEl, el("p", {}, "Your cart is empty."));
+subEl.textContent = USD.format(0);
+taxEl.textContent = USD.format(0);
+totEl.textContent = USD.format(0);
+return;
+}
+
+
+const frag = document.createDocumentFragment();
+for (const l of lines) frag.appendChild(cartLineElement(l));
+listEl.replaceChildren(frag);
+
+
+const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
+const tax = 0; // set your tax if needed
+const total = subtotal + tax;
+
+
+subEl.textContent = USD.format(subtotal);
+taxEl.textContent = USD.format(tax);
+totEl.textContent = USD.format(total);
+}
 
   // Quantity input (direct edit)
   document.addEventListener("input", (e) => {
@@ -397,29 +491,34 @@ function bindListControls(listEl, allProducts) {
       })
       .filter(Boolean);
 
-    listEl.innerHTML = lines
-      .map(
-        (l) => `
-      <div class="cart-line" data-id="${l.id}">
-        <img src="${l.imageUrl}" alt="${escapeHtml(l.title)}">
-        <div>
-          <h3 class="cart-line__title">${escapeHtml(l.title)}</h3>
-          <div class="cart-line__meta">${USD.format(l.price)} x ${l.qty}</div>
-        </div>
-        <div class="cart-line__total">${USD.format(l.lineTotal)}</div>
-      </div>
-    `
-      )
-      .join("");
+   const frag = document.createDocumentFragment();
+for (const l of lines) {
+const row = el(
+"div",
+{ class: "cart-line", dataset: { id: l.id } },
+el("img", { src: l.imageUrl, alt: l.title }),
+el(
+"div",
+{},
+el("h3", { class: "cart-line__title" }, l.title),
+el("div", { class: "cart-line__meta" }, `${USD.format(l.price)} x ${l.qty}`)
+),
+el("div", { class: "cart-line__total" }, USD.format(l.lineTotal))
+);
+frag.appendChild(row);
+}
+listEl.replaceChildren(frag);
 
-    const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
-    const tax = 0;
-    const total = subtotal + tax;
 
-    subEl.textContent = USD.format(subtotal);
-    taxEl.textContent = USD.format(tax);
-    totEl.textContent = USD.format(total);
-  });
+const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
+const tax = 0;
+const total = subtotal + tax;
+
+
+subEl.textContent = USD.format(subtotal);
+taxEl.textContent = USD.format(tax);
+totEl.textContent = USD.format(total);
+});
 
   // Lightweight client-side validation
   if (form) {
@@ -435,15 +534,18 @@ function bindListControls(listEl, allProducts) {
 
       clearCart();
 
-      root.innerHTML = `
-        <div class="notice" role="status" aria-live="polite">
-          <h2>Thank You!</h2>
-          <p>Your order has been placed. A confirmation is on its way.</p>
-          <a class="primary" href="products.html">Continue Shopping</a>
-        </div>
-      `;
-    });
-  }
+    const notice = el(
+"div",
+{ class: "notice", role: "status", ariaLive: "polite" },
+el("h2", {}, "Thank You!"),
+el("p", {}, "Your order has been placed. A confirmation is on its way."),
+el("a", { class: "primary", href: "products.html" }, "Continue Shopping")
+);
+
+
+replace(root, notice);
+});
+}
 })();
 
 // ──────────────────────────────────────────────────────────────────────────────

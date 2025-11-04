@@ -220,7 +220,7 @@ main {max-width: 1100px; margin-inline: auto; padding: 1rem; }
   line-height: 1.25;
   max-height: calc(1.25em * 2);
   overflow: hidden;
-  position: relative;
+ 
   min-height: calc(1.25em * 2);
 }
 
