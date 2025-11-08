@@ -130,11 +130,13 @@ function normalizeProduct(p) {
   const gender = g.includes("female") ? "women" : g.includes("male") ? "men" : "unisex";
 
   return {
+    sizes: Array.isArray(p.sizes) ? p.sizes.map((s) => String(s).toUpperCase()) : [],
     id: p.id,
-    title: p.title ?? "Jacket",
+    title: p.title ?? "jacket",
     price: Number(p.discountedPrice ?? p.price ?? 0),
     imageUrl: p.image?.url || p.images?.[0]?.url || "",
     gender,
+    
   };
 }
 
@@ -193,15 +195,17 @@ listEl.replaceChildren(frag);
 
 /** Read current filters (safe if the elements are missing) */
 function getFilters() {
+  const size = (document.getElementById("filter-size")?.value || "").trim().toUpperCase();
   const gender = (document.getElementById("filter-gender")?.value || "").trim().toLowerCase();
   const q = (document.getElementById("filter-search")?.value || "").trim().toLowerCase();
-  return { gender, q };
+  return { size, gender, q };
 }
+
 
 /** Apply gender + query filters to a list (pure function) */
 function applyFilters(raw) {
-  const { gender, q } = getFilters();
-
+  const { gender, q, size } = getFilters();
+  
   return raw.filter((p) => {
     // Gender: allow "unisex" to be included when "women" or "men" is selected
     const matchGender =
@@ -211,13 +215,15 @@ function applyFilters(raw) {
       (gender === "men" && p.gender === "unisex");
 
     const matchQuery = !q || p.title.toLowerCase().includes(q);
+    const matchSize = !size || (Array.isArray(p.sizes) && p.sizes.includes(size));
 
-    return matchGender && matchQuery;
+    return matchGender && matchQuery && matchSize;
   });
 }
 
 /** Wire up filter controls and add-to-cart (event delegation) */
 function bindListControls(listEl, allProducts) {
+
   // Apply button
   document.getElementById("apply-filters")?.addEventListener("click", () => {
     renderProducts(listEl, applyFilters(allProducts));
@@ -227,15 +233,22 @@ function bindListControls(listEl, allProducts) {
   document.getElementById("clear-filters")?.addEventListener("click", () => {
     const g = document.getElementById("filter-gender");
     const s = document.getElementById("filter-search");
+    const z = document.getElementById("filter-size");
     if (g) g.value = "";
     if (s) s.value = "";
+    if (z) z.value = "";
     renderProducts(listEl, allProducts);
   });
-
   // Live search as you type 
   document.getElementById("filter-search")?.addEventListener("input", () => {
     renderProducts(listEl, applyFilters(allProducts));
   });
+     // Live size change
+document.getElementById("filter-size")?.addEventListener("change", () => {
+  renderProducts(listEl, applyFilters(allProducts));
+});
+}
+
 
   // Add-to-cart via event delegation (survives re-renders)
   document.addEventListener("click", (e) => {
@@ -255,7 +268,7 @@ function bindListControls(listEl, allProducts) {
       btn.disabled = false;
     }, 700);
   });
-}
+
 
 /** Boot the products page (no-op on other pages) */
 (async function bootListPage() {
