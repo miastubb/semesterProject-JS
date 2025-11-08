@@ -136,7 +136,7 @@ function normalizeProduct(p) {
     price: Number(p.discountedPrice ?? p.price ?? 0),
     imageUrl: p.image?.url || p.images?.[0]?.url || "",
     gender,
-    
+    description: p.description ?? "",
   };
 }
 
@@ -153,28 +153,39 @@ function normalizeProduct(p) {
 /** Small template for a single product card */
 function cardElement(p) {
 const img = el("img", { src: p.imageUrl, alt: p.title, loading: "lazy" });
-const title = el("h3", { class: "card__title" }, p.title);
+
+const mediaLink = el(
+  "a",
+  { href: `product.html?id=${p.id}`, class: "card__media" },
+  img
+);
+const titleLink = el(
+  "a",
+  { href: `product.html?id=${p.id}` },
+  p.title
+);
+const title = el("h3", { class: "card__title" }, titleLink);
 const price = el("p", { class: "price" }, USD.format(p.price));
 const tag = el("small", { class: "tag" }, p.gender);
 const btn = el(
-"button",
-{
-class: "primary add-to-cart",
-dataset: { id: p.id },
-ariaLabel: `Add ${p.title} to cart`,
-},
-"Add to cart"
+  "button",
+  {
+    class: "primary add-to-cart",
+    dataset: { id: p.id },
+    "aria-label": `Add ${p.title} to cart`,
+  },
+  "Add to cart"
 );
 
 
 return el(
-"article",
-{ class: "card", dataset: { id: p.id } },
-img,
-title,
-price,
-tag,
-btn
+  "article",
+  { class: "card", dataset: { id: p.id } },
+  mediaLink,
+  title,
+  price,
+  tag,
+  btn
 );
 }
 /** Render list or an empty-state message */
@@ -293,6 +304,86 @@ replace(list, msg);
 }
 })();
 
+// ──────────────────────────────────────────────────────────────────────────────
+//product page: single product details
+// ──────────────────────────────────────────────────────────────────────────────
+(async function bootProductPage() {
+  const root = document.getElementById("product-root");
+  if (!root) return;
+
+  // Step 1: Check for ID in URL
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+
+  if (!id) {
+    root.innerHTML = `<p class="error" role="alert">No product ID specified. <a href="products.html">Go back to products</a></p>`;
+    return;
+  }
+
+  // Step 2: Loading state
+  root.textContent = "Loading product…";
+
+  try {
+    // Step 3: Fetch single product
+    const res = await fetch(`${ENDPOINT}/${encodeURIComponent(id)}`, {
+      headers: { Accept: "application/json" },
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const { data } = await res.json();
+    if (!data) throw new Error("Unexpected response format.");
+
+    const p = normalizeProduct(data);
+
+    const backLink = el(
+      "a", { href: "products.html" },
+      "← Back to products"
+    );
+    const img = el("img", {
+      src: p.imageUrl,
+      alt: data.image?.alt || p.title,
+      loading: "eager",
+    });
+    const media = el("div", { class: "product-detail__media" }, img);
+
+    const title = el("h1", {class: "product-detail__title" }, p.title);
+    const price = el("p", { class: "price" }, USD.format(p.price));
+    const desc = el(
+      "p",
+      { class: "product-detail__description" },
+      p.description || "No description available."
+    );
+
+    const body = el(
+      "div",
+      { class: "product-detail__body" },
+      title,
+      price,
+      desc,
+    );
+
+    const view = el(
+      "article",
+      { class: "product-detail", dataset: {id: p,id } },
+      backLink,
+      media,
+      body,
+    );
+    replace(root, view);
+
+
+  } catch (err) {
+    // Step 5: Handle network or data errors
+    root.innerHTML = `
+      <p class="error" role="alert">
+        Could not load product. ${err.message}
+      </p>
+      <p><a href="products.html">Return to product list</a></p>
+    `;
+    console.error("Error loading product:", err);
+  }
+})();
 // ──────────────────────────────────────────────────────────────────────────────
 /* Cart Page
    Expected DOM on cart.html:
