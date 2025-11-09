@@ -355,22 +355,69 @@ replace(list, msg);
       p.description || "No description available."
     );
 
+// Size picker. one radio per size available
+    const sizeFieldset = el(
+      "fieldset",
+      { class: "size-picker" },
+      el("legend", {}, "Select Size:"),
+      ...p.sizes.map((sz) =>
+        el(
+          "label",
+          { class: "size-option" },
+          el("input", {
+            type: "radio",
+            name: "size",
+            value: sz,
+          }),
+          sz
+        )
+      )
+    );
+
+    const addBtn = el("button", { class: "primary", id: "detail-add" }, "Add to cart");
+    const msg = el("p", { id: "detail-msg", role: "alert", hidden: true });
+
+
     const body = el(
       "div",
       { class: "product-detail__body" },
       title,
       price,
       desc,
+      sizeFieldset,
+      addBtn,
+      msg,
     );
 
     const view = el(
       "article",
-      { class: "product-detail", dataset: {id: p,id } },
+      { class: "product-detail", dataset: { id: p.id } },
       backLink,
       media,
       body,
     );
     replace(root, view);
+
+    addBtn.addEventListener("click", () => {
+      const chosen = root.querySelector("input[name='size']:checked")?.value;
+      if (!chosen) {
+        msg.textContent = "please choose a size";
+        msg.hidden = false;
+        return;
+      }
+      
+      msg.hidden = true;
+      addToCart(p.id, 1);
+      updateCartBadge(getCartCount());
+
+      addBtn.disabled = true;
+      const prev = addBtn.textContent;
+      addBtn.textContent = "Added";
+      setTimeout(() => {
+        addBtn.textContent = prev;
+        addBtn.disabled = false;
+      }, 800);
+    });
 
 
   } catch (err) {
