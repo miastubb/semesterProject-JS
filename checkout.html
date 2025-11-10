@@ -62,7 +62,7 @@
           </div>
         </div>
 
-        <form id="checkout-form" class="checkout__form" novalidate>
+        <form id="checkout-form" class="checkout__form">
           <h2>Billing details</h2>
           <label>
             Full name
@@ -82,32 +82,44 @@
           </label>
           <label>
             Postal code
-            <input name="zip" required pattern="\\d{4,10}" />
+            <input name="zip" />
           </label>
 
           <h2>Payment</h2>
           <label>
             Card number
             <input
-              name="card"
+              name="cardnumber"
               inputmode="numeric"
-              minlength="12"
-              maxlength="19"
+              placeholder="4242 4242 4242 4242"
+              pattern="^\d{4}\s?\d{4}\s?\d{4}\s?\d{4}$"
+              title="Enter 16 digits, space allowed"
               required
+              autocomplete="cc-number"
             />
           </label>
+
           <label>
             Expiry
-            <input name="exp" placeholder="MM/YY" required />
+            <input
+              name="CardExpiry"
+              placeholder="MM/YY"
+              pattern="^(0[1-9]|1[0-2])\/\d{2}$"
+              title="MM/YY, e.g. 09/25"
+              required
+              autocomplete="cc-exp"
+            />
           </label>
+
           <label>
             CVC
             <input
-              name="cvc"
+              name="CardCvc"
               inputmode="numeric"
-              minlength="3"
-              maxlength="4"
+              placeholder="123"
+              pattern="^\d{3}$"
               required
+              autocomplete="cc-csc"
             />
           </label>
 
