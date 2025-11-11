@@ -1,12 +1,19 @@
 /* ---------- base ---------- */
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; height: 100%; }
 body {
   background: var(--body-bg);
   color: var(--body-text);
   font-family: system-ui, sans-serif;
   font-size: var(--body-size);
   line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+body > main {
+  flex: 1;
 }
 h1, h2, h3 {
       font-family: "Merriweather", system-ui, serif; 
@@ -26,15 +33,21 @@ body > header {
 body > header a { color: var(--header-footer-text); text-decoration: none; }
 body > header a:hover { text-decoration: underline; }
 body > header .container {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: clamp(12px, 2.5vw, 24px) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(12px, 2.5vw, 24px) var(--spacing-md);
 }
 .brand {
   font-weight: 800;
   font-size: clamp(1.4rem, 2.2vw + 0.4rem, 2.4rem);
   letter-spacing: .2px;
 }
-.cart-link { position: relative; font-size: clamp(1.5rem, 1.2vw + .6rem, 1.15rem); }
+.cart-link {
+  position: relative;
+  font-size: clamp(1.4rem, 2vw, 1.9rem);
+  margin-right: 0.25rem;
+}
 .cart-count {
   position: absolute; top: -6px; right: -10px;
   background: var(--header-footer-text); color: var(--header-footer-bg);
@@ -118,6 +131,13 @@ h3 { margin: var(--spacing-sm) 0; }
 }
 
 .hero__cta { padding: .75rem 1.25rem; }
+
+.home h1, h2 {
+  text-align: center;
+  margin-block: 1rem;
+  color: #23492d;
+}
+
 
 /* ---------- home page only --------*/
 .home { min-height: 100svh; display: flex; flex-direction: column; }
