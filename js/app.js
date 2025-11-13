@@ -447,6 +447,14 @@ replace(list, msg);
   const root = document.getElementById("cart-root");
   if (!root) return; // not on cart page
 
+  const backLink = el(
+    "a",
+    { href: "products.html", class: "back-link" },
+    el("i", { class: "fa-solid fa-arrow-left", ariaHidden: "true" }),
+    " Back to products"
+  );
+  root.prepend(backLink);
+  
   const listEl = document.getElementById("cart-list");
   const subEl = document.getElementById("cart-subtotal");
   const taxEl = document.getElementById("cart-tax");
@@ -461,7 +469,8 @@ listEl,
 el("p", { class: "error", role: "alert" }, "Could not load products. Please try again later.")
 );
 return;
-}
+
+  }
 
   // Quick access by id
   const byId = new Map(catalog.map((p) => [p.id, p]));
