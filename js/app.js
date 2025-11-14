@@ -504,7 +504,7 @@ function cartLineElement(l) {
     "div",
     { class: "cart-line__qty" },
     el("button", { class: "ghost decr", type: "button", "aria-label": "Decrease quantity" }, "−"),
-    el("input", { type: "number", min: 1, value: String(l.qty) }),
+    el("input", { type: "number", min: 1, value: String(l.qty), "aria-label": `Quantity for ${l.title}` }),
     el("button", { class: "ghost incr", type: "button", "aria-label": "Increase quantity" }, "+")
   );
 
