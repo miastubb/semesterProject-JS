@@ -446,7 +446,6 @@ replace(list, msg);
 (async function bootCartPage() {
   const root = document.getElementById("cart-root");
   if (!root) return; // not on cart page
-
   const backLink = el(
     "a",
     { href: "products.html", class: "back-link" },
@@ -615,6 +614,13 @@ totEl.textContent = USD.format(total);
 (function bootCheckoutPage() {
   const root = document.getElementById("checkout-root");
   if (!root) return; // not on checkout page
+  const backLink = el(
+    "a",
+    { href: "products.html", class: "back-link" },
+    el("i", { class: "fa-solid fa-arrow-left", ariaHidden: "true" }),
+    " Back to products"
+  );
+  root.prepend(backLink);
 
   const listEl = document.getElementById("checkout-list");
   const subEl = document.getElementById("co-subtotal");
@@ -707,4 +713,3 @@ replace(root, notice);
 });
 }
 })();
-

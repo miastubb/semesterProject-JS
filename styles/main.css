@@ -384,7 +384,11 @@ user-select: none;
   .size-option:hover {
     border-color: #32843c;
   }
-
+.size-option:has(input[type="radio"]:checked) {
+  background: #2d5e3a;
+  color: #fff;
+  border-color: #2d5e3a;
+}
 
 /*cart page*/
 .cart {
@@ -517,6 +521,32 @@ s { color: #606060; }
 
 /* ---------- summary card ---------- */
 /*deleted because unsused*/
+
+/* ---------- forms (checkout) ---------- */
+#checkout-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+#checkout-form input {
+  padding: 0.75rem 1rem;   
+  font-size: 1rem;          
+  border: 1px solid #cccccc;
+  border-radius: 8px;      
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05); 
+  color: #333;
+}
+
+#checkout-form input:focus {
+  outline: 3px solid var(--focus-color);
+  border-color: var(--header-footer-bg);
+}
+
 
 /* ---------- messages + spinner ---------- */
 .notice {
