@@ -507,6 +507,7 @@ function cartLineElement(l) {
     el("input", { type: "number", min: 1, value: String(l.qty), "aria-label": `Quantity for ${l.title}` }),
     el("button", { class: "ghost incr", type: "button", "aria-label": "Increase quantity" }, "+")
   );
+/*“Removed development debug logging to ensure production-ready code and clean console output.*/
 
   const actions = el(
     "div",
